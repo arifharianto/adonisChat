@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot</title>
+    <script src="https://unpkg.com/htmx.org@1.8.4"></script>
+    <style>
+        #chatbox {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        #chatbox div {
+            margin-bottom: 10px;
+        }
+        form {
+            position: fixed;
+            bottom: 20px;
+            width: calc(100% - 40px);
+            background: white;
+            padding: 10px;
+        }
+        input[type="text"] {
+            width: 80%;
+            padding: 8px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 8px 15px;
+        }.message-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .message {
+        max-width: 70%;
+        padding: 10px 15px;
+        border-radius: 15px;
+        margin: 5px 0;
+    }
+    
+    .user-message {
+        align-self: flex-end;
+        background-color: #8cc3ff;
+        color: white;
+        margin-left: auto;
+    }
+    
+    .ai-message {
+        align-self: flex-start;
+        background-color: #e9ecef;
+        color: black;
+        margin-right: auto;
+    }
+    </style>
+</head>
+<body>
+    <h1>AI Chatbot</h1>
+    
+    <div id="chatbox" class="message-container">
+        @each(message in messages)
+            <div class="message user-message"><strong>You:</strong> {{ message.user_message }}</div>
+            <div class="message ai-message"><strong>AI:</strong> {{ message.ai_response }}</div>
+        @endeach
+    </div>
+
+    <form hx-post="/chat" hx-target="#chatbox" hx-swap="beforeend">
+        <input type="hidden" name="user_id" value="{{ userId }}">
+        <input type="text" id="message" name="message" required placeholder="Ask me something...">
+        <button type="submit">Send</button>
+    </form>
+
+    <script>
+        // Auto scroll to bottom when new messages are added
+        document.body.addEventListener('htmx:afterSwap', function() {
+            const chatbox = document.getElementById('chatbox');
+            chatbox.scrollTop = chatbox.scrollHeight;
+            // Clear input field after successful submission
+            document.getElementById('message').value = '';
+        });
+    </script>
+</body>
+</html>
